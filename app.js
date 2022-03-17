@@ -1,28 +1,41 @@
-const { create } = require('domain');
 const express = require('express');
+const morgan = require('morgan');
 const fs = require('fs');
 const app = express();
+
+//MIDDLEWARES
+app.use(morgan('dev'));
+
 app.use(express.json());
 app.use((req, res, next) => {
 	console.log('Hello from the middleware');
 	next();
 });
+
+app.use((req, res, next) => {
+	req.requestTime = new Date().toISOString();
+	next();
+});
+
 const tours = JSON.parse(
 	fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
 const getAllTours = (req, res) => {
+	console.log(req.requestTime);
 	res.status(200).json({
 		status: 'success',
 		results: tours.length,
 		data: {
 			tours,
 		},
+		requestedAt: req.requestTime,
 	});
 };
 
 const getTour = (req, res) => {
 	console.log(req.params);
+
 	const id = req.params.id * 1;
 
 	const tour = tours.find((el) => el.id === id);
@@ -31,6 +44,7 @@ const getTour = (req, res) => {
 			status: 'fail',
 			messase: 'Invalid Tour Id',
 		});
+		return;
 	}
 	res.status(200).json({
 		status: 'success',
@@ -93,6 +107,8 @@ const deleteTour = (req, res) => {
 // app.post('/api/v1/tours', createTour);
 // app.patch('/api/v1/tours/:id', updateTour);
 // app.delete('/api/v1/tours/:id', deleteTour);
+
+//ROUTES
 
 app.route('/api/v1/tours').get(getAllTours).post(createTour);
 
