@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 dotenv.config({path: './config.env'});
 
 const app = require('./app');
-console.log(process.env);
+// console.log(process.env);
 const port = process.env.PORT || 3000;
 
 const DB = process.env.DATABASE_LOCAL;
@@ -13,7 +13,7 @@ mongoose.connect(DB, {
 	useCreateIndex: true,
 	useFindAndModify: false
 }).then(con => {
-	console.log(con.connections);
+	// console.log(con.connections);
 	console.log('DB connection successful');
 })
 
